@@ -15,6 +15,7 @@ module.exports = {
     'plugin:prettier/recommended'
   ],
   rules: {
+    '@typescript-eslint/member-delimiter-style': 'off',
     'prettier/prettier': [
       'error',
       {
