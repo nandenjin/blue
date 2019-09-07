@@ -1,6 +1,6 @@
 precision highp float;
 
-#define PI 3.1415
+#define PI 3.141592653
 
 uniform vec2 pointerPos;
 uniform vec2 worldSize;
@@ -21,6 +21,10 @@ vec4 getData(sampler2D data, vec2 pos) {
   if(t.y > 0.5) t.y = -(t.y - 0.5) * 2.0;
   else t.y = t.y * 2.0;
 
+  if (!(0.0 <= pos.x && pos.x <= 1.0) || !(0.0 <= pos.y && pos.y <= 1.0)) {
+    t = t / 5.0;
+  }
+
   return t;
 }
 
@@ -40,8 +44,9 @@ void main() {
   vec2 pos = gl_FragCoord.xy;
   vec2 posTex = pos / worldSize + vec2(cos(direction * PI * 2.0), sin(direction * PI * 2.0)) * 0.01 * speed;
   vec4 va = getData(data, posTex);
+
   vec2 v = va.xy;
-  float power = 0.3;
+  float power = 3.9;
 
   vec2 mPos = vec2(pointerPos.x / worldSize.x, 1.0 - pointerPos.y / worldSize.y) * worldSize;
   vec2 powerFromPointer = normalize(pos - mPos) * (1.0 - min(max(length(pos - mPos) / cursorSize, 0.0), 1.0));
@@ -56,16 +61,21 @@ void main() {
   vec2 offsetX = vec2(1.0, 0.0);
   vec2 offsetY = vec2(0.0, 1.0);
 
-  v += getData(data, posTex + offsetX).xy * power;
-  v += getData(data, posTex - offsetX).xy * power;
-  v += getData(data, posTex + offsetY).xy * power;
-  v += getData(data, posTex - offsetY).xy * power;
-  v += getData(data, posTex + offsetX + offsetY).xy * power;
-  v += getData(data, posTex + offsetX - offsetY).xy * power;
-  v += getData(data, posTex - offsetX + offsetY).xy * power;
-  v += getData(data, posTex - offsetX - offsetY).xy * power;
+  for(float i = 1.0; i <= 0.0; i += 1.0) {
+    v += getData(data, posTex + offsetX * i).xy * power / i;
+    v += getData(data, posTex - offsetX * i).xy * power / i;
+    v += getData(data, posTex + offsetY * i).xy * power / i;
+    v += getData(data, posTex - offsetY * i).xy * power / i;
+    v += getData(data, posTex + offsetX * i + offsetY * i).xy * power / i;
+    v += getData(data, posTex + offsetX * i - offsetY * i).xy * power / i;
+    v += getData(data, posTex - offsetX * i + offsetY * i).xy * power / i;
+    v += getData(data, posTex - offsetX * i - offsetY * i).xy * power / i;
+  }
 
-  if(length(v) > 0.01) v *= 0.99;
+  if(length(v) > 0.0001) {
+    v *= 0.99;
+    va.w *= 0.99999;
+  }
   
   gl_FragColor = vec4(toSaveData(v), va.zw);
 }

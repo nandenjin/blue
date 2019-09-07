@@ -65,9 +65,9 @@ function render(): void {
   composer.render(Date.now())
 
   if (isTouching) {
-    cursorSize = Math.min(Math.max(cursorSize + 1, 60), 100)
+    cursorSize = Math.min(Math.max(cursorSize + 1, 100), 200)
   } else {
-    cursorSize = Math.max(0, cursorSize * 0.98)
+    cursorSize = Math.max(0, cursorSize * 0.97)
   }
 
   if (isColorTouching) {
